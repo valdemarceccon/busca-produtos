@@ -2,12 +2,14 @@ package pucpr.lojas;
 
 import static pucpr.Constantes.PORTA_GRUPO;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import pucpr.Constantes;
+import pucpr.servidor.Busca;
+import pucpr.servidor.ResultadoBusca;
 
 public class Loja extends Thread {
 
@@ -34,9 +36,32 @@ public class Loja extends Thread {
 
             while (true) {
                 socket.receive(datagramPacket);
-                System.out.printf("%s recebeu %s%n", nome, new String(datagramPacket.getData(), datagramPacket.getOffset(), datagramPacket.getLength()));
+                final ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(datagramPacket.getData()));
+                final Busca busca = (Busca) inputStream.readObject();
+                System.out.printf("%s recebeu %s do usuário %s%n", nome, busca.getTermo(), busca.getUsuario());
+                enviarParaServer(busca);
             }
 
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void enviarParaServer(Busca busca) {
+        StringBuilder r = new StringBuilder();
+        final ResultadoBusca resultadoBusca = new ResultadoBusca(busca.getUsuario());
+        for (String s : estoque) {
+            if (s.toUpperCase().contains(busca.getTermo().toUpperCase()))
+            resultadoBusca.addResultado(s);
+        }
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final ObjectOutputStream outputStream = new ObjectOutputStream(out);
+            outputStream.writeObject(resultadoBusca);
+            DatagramSocket socket = new DatagramSocket();
+            DatagramPacket packet = new DatagramPacket(out.toByteArray(), out.size(), new InetSocketAddress(Constantes.PORTA_UPD));
+//            packet.setData(r.toString().getBytes(), 0, r.length());
+            socket.send(packet);
         } catch (IOException e) {
             e.printStackTrace();
         }

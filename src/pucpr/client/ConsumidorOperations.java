@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 
+import pucpr.servidor.Busca;
 import pucpr.servidor.ConsumidorRequest;
 
 public class ConsumidorOperations {

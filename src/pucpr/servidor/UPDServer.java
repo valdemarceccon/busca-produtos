@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +23,8 @@ public class UPDServer extends Thread {
                 DatagramPacket packet = new DatagramPacket(new byte[4096], 4096);
                 socket.receive(packet);
                 final ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(packet.getData()));
-                List<String> resp = (List<String>) inputStream.readObject();
-                for (String s : resp) {
+                ResultadoBusca resp = (ResultadoBusca) inputStream.readObject();
+                for (String s : resp.getResultado()) {
                     System.out.println("Recebeu da loja: " + s);
                 }
             }
