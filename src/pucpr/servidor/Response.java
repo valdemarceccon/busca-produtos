@@ -1,8 +1,8 @@
 package pucpr.servidor;
 
 import java.io.Serializable;
-import java.util.List;
 
-public class Response implements Serializable {
-    public List<String> valor;
+public abstract class Response implements Serializable {
+    public RequestStatus status = RequestStatus.SUCESSO;
+    public String mensagem = "";
 }

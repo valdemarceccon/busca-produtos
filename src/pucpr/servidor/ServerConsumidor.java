@@ -1,32 +1,27 @@
 package pucpr.servidor;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import pucpr.Constantes;
 
-public class ServerAdmin extends Thread {
-
+public class ServerConsumidor extends Thread {
     @Override
     public void run() {
         try {
             ServerSocket s = new ServerSocket();
-            s.bind(new InetSocketAddress(Constantes.PORTA_ADMIN));
-            System.out.println("Servidor admin inciado");
+            s.bind(new InetSocketAddress(Constantes.PORTA_CLIENTE));
+            System.out.println("Servidor consumidor inciado");
             while (true) {
                 final Socket socket = s.accept();
                 System.out.println("Recebida conexão com admin");
-                new AdminOperations(socket).start();
+                new ConsumidorOperations(socket).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
-
 }

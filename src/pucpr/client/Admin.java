@@ -8,25 +8,27 @@ import java.net.Socket;
 import java.util.Scanner;
 
 import pucpr.Constantes;
-import pucpr.servidor.AdminOpcoes;
-import pucpr.servidor.AdminRequest;
-import pucpr.servidor.Response;
+import pucpr.servidor.*;
 
 public class Admin {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Bem vindo ao terminal de admin");
-        while (true) {
-            String s = menu(scanner);
-            Runnable op = getOpcao(s, scanner);
+        try (Socket socket = connectar()) {
+            System.out.println("Bem vindo ao terminal de admin");
+            while (socket.isConnected()) {
+                String opts = menu(scanner);
+                AdminOperations operations = new AdminOperations(socket, scanner);
+                boolean opaoValida = execOpcao(opts, operations);
 
-            while (op == null) {
-                System.out.println("Općão invalida. Pressione qualquer tecla para continuar");
-                scanner.nextLine();
-                s = menu(scanner);
-                op = getOpcao(s, scanner);
+                while (!opaoValida) {
+                    System.out.println("Općão invalida. Pressione qualquer tecla para continuar");
+                    scanner.nextLine();
+                    opts = menu(scanner);
+                    opaoValida = execOpcao(opts, operations);
+                }
             }
-            op.run();
+        } catch (IOException e) {
+            System.out.println("Não foi possível conectar ao servidor");
         }
     }
 
@@ -36,65 +38,45 @@ public class Admin {
         System.out.println("1 - Histórico buscas");
         System.out.println("2 - Visualizar Tmax");
         System.out.println("3 - Update Tmax");
+        System.out.println("0 - Sair");
         System.out.println("");
         System.out.print("Općão: ");
 
         return scanner.nextLine();
     }
 
-    private static Runnable getOpcao(String s, Scanner scanner) {
-        if (s == null || s.trim().isEmpty()) {
-            return null;
+    private static boolean execOpcao(String opts, AdminOperations admOp) {
+        if (opts == null || opts.trim().isEmpty()) {
+            return false;
         }
 
-        if (s.trim().equals("1")) {
-            return () -> chamarServidor(new AdminRequest(AdminOpcoes.HistoricoBusca));
+        if (opts.trim().equals("1")) {
+            admOp.historicoBusca();
+            return true;
         }
 
-        if (s.trim().equals("2")) {
-            return () -> chamarServidor(new AdminRequest(AdminOpcoes.VerTMax));
+        if (opts.trim().equals("2")) {
+            admOp.verTMax();
+            return true;
         }
 
-        if (s.trim().equals("3")) {
-            System.out.print("Novo valor para Tmax: ");
-            String valor = scanner.nextLine();
-            if (valor.trim().isEmpty()) {
-                System.out.println("Tmax vazio.");
-                return null;
-            }
-
-            return () -> chamarServidor(new AdminRequest(AdminOpcoes.AtualizarTMax, valor));
+        if (opts.trim().equals("3")) {
+            admOp.updateTMax();
+            return true;
         }
 
-        if (s.trim().equals("0")) {
+        if (opts.trim().equals("0")) {
             System.out.println("Até mais");
             System.exit(0);
         }
 
-        return null;
+        return false;
     }
 
-    public static void chamarServidor(AdminRequest request) {
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(Constantes.PORTA_ADMIN));
-            try (final ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
-                objectOutputStream.writeObject(request);
-                objectOutputStream.flush();
-                try (final ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())) {
-                    final Response response = (Response) ois.readObject();
-                    if (response.valor == null || response.valor.isEmpty()) {
-                        System.out.println("Servidor respondeu nada");
-                    } else {
-                        System.out.println("Resultado: ");
-                        for (String s1 : response.valor) {
-                            System.out.println(s1);
-                        }
-                    }
-                }
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    private static Socket connectar() throws IOException {
+        Socket socket = new Socket();
+        socket.connect(new InetSocketAddress(Constantes.PORTA_ADMIN));
+        return socket;
     }
+
 }
