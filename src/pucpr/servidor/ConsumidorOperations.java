@@ -1,9 +1,11 @@
 package pucpr.servidor;
 
+import static pucpr.Constantes.PORTA_GRUPO;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,6 +25,12 @@ public class ConsumidorOperations extends Thread {
                 ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
                 final ConsumidorRequest o = (ConsumidorRequest) inputStream.readObject();
                 Servidor.salvarTermoNoHistorico(o.getUser(), o.getTermo());
+
+                MulticastSocket multicastSocket = new MulticastSocket();
+                final InetAddress byName = InetAddress.getByName("224.0.0.1");
+                DatagramPacket busca = new DatagramPacket(o.getTermo().getBytes(), o.getTermo().length(), byName, PORTA_GRUPO);
+                multicastSocket.send(busca);
+
                 List<String> resultadoBusca = new ArrayList<>();
                 Random random = new Random();
                 int ini = random.nextInt(10) + 3;

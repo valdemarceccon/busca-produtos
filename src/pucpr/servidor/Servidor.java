@@ -14,8 +14,11 @@ public class Servidor {
         historico = new ArrayList<>();
         final ServerAdmin serverAdmin = new ServerAdmin();
         final ServerConsumidor serverConsumidor = new ServerConsumidor();
+        final UPDServer updServer = new UPDServer();
         serverAdmin.start();
         serverConsumidor.start();
+        updServer.start();
+        updServer.join();
         serverAdmin.join();
         serverConsumidor.join();
     }
