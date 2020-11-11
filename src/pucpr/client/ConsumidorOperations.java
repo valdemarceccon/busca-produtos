@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.List;
 
-import pucpr.servidor.Busca;
 import pucpr.servidor.ConsumidorRequest;
+import pucpr.servidor.ResultadoBusca;
 
 public class ConsumidorOperations {
 
@@ -19,9 +18,9 @@ public class ConsumidorOperations {
         this.nome = nome;
     }
 
-    public List<String> buscar(String termo) throws IOException, ClassNotFoundException {
+    public ResultadoBusca buscar(String termo) throws IOException, ClassNotFoundException {
         write(new ConsumidorRequest(nome, termo));
-        return (List<String>) read();
+        return (ResultadoBusca) read();
     }
 
     private void write(Object obj) throws IOException {

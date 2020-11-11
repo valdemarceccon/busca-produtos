@@ -24,6 +24,8 @@ public class UPDServer extends Thread {
                 socket.receive(packet);
                 final ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(packet.getData()));
                 ResultadoBusca resp = (ResultadoBusca) inputStream.readObject();
+
+                Servidor.adicionar(resp);
                 for (String s : resp.getResultado()) {
                     System.out.println("Recebeu da loja: " + s);
                 }

@@ -1,15 +1,20 @@
 package pucpr.servidor;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 public class Servidor {
     public static long TMAX = 1000;
     public static List<Busca> historico;
     public static Semaphore mutexHist = new Semaphore(1);
+
+    public static Map<String, ResultadoBusca> pollResultados = new HashMap<>();
+    public static Semaphore mutexPollResultados = new Semaphore(1);
+
     public static void main(String[] args) throws InterruptedException {
         historico = new ArrayList<>();
         final ServerAdmin serverAdmin = new ServerAdmin();
@@ -32,5 +37,30 @@ public class Servidor {
             e.printStackTrace();
         }
 
+    }
+
+    public static void limparPoll(String user) {
+        try {
+            mutexPollResultados.acquire();
+            pollResultados.remove(user);
+            mutexPollResultados.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void adicionar(ResultadoBusca resp) {
+        try {
+            mutexPollResultados.acquire();
+            if (pollResultados.containsKey(resp.getIdentificacao())) {
+                final ResultadoBusca resultadoBusca = pollResultados.get(resp.getIdentificacao());
+                resultadoBusca.getResultado().addAll(resp.getResultado());
+            } else {
+                pollResultados.put(resp.getIdentificacao(), resp);
+            }
+            mutexPollResultados.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

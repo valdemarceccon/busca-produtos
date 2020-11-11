@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import pucpr.Constantes;
+import pucpr.servidor.ResultadoBusca;
 
 public class Consumidor {
     public static void main(String[] args) {
@@ -19,9 +20,9 @@ public class Consumidor {
             while (socket.isConnected()) {
                 String termo = readTermo(scanner);
                 final ConsumidorOperations consumidorOperations = new ConsumidorOperations(socket, identificacao);
-                final List<String> resultado = consumidorOperations.buscar(termo);
+                final ResultadoBusca resultado = consumidorOperations.buscar(termo);
                 System.out.println("Resultados da busca: ");
-                for (String s : resultado) {
+                for (String s : resultado.getResultado()) {
                     System.out.println("  - " + s);
                 }
                 System.out.println();

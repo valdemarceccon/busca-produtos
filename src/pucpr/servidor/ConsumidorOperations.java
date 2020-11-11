@@ -25,31 +25,27 @@ public class ConsumidorOperations extends Thread {
             while (socket.isConnected()) {
 
                 ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-                final ConsumidorRequest o = (ConsumidorRequest) inputStream.readObject();
-                Servidor.salvarTermoNoHistorico(o.getUser(), o.getTermo());
+                final ConsumidorRequest consumidorRequest = (ConsumidorRequest) inputStream.readObject();
+                Servidor.salvarTermoNoHistorico(consumidorRequest.getUser(), consumidorRequest.getTermo());
 
                 final ByteArrayOutputStream out = new ByteArrayOutputStream();
                 final ObjectOutputStream outputStream = new ObjectOutputStream(out);
-                outputStream.writeObject(criarBusca(o));
+                outputStream.writeObject(criarBusca(consumidorRequest));
 
                 MulticastSocket multicastSocket = new MulticastSocket();
                 final InetAddress byName = InetAddress.getByName("224.0.0.1");
                 DatagramPacket busca = new DatagramPacket(out.toByteArray(), out.size(), byName, PORTA_GRUPO);
+                Servidor.limparPoll(consumidorRequest.getUser());
                 multicastSocket.send(busca);
 
-                List<String> resultadoBusca = new ArrayList<>();
-                Random random = new Random();
-                int ini = random.nextInt(10) + 3;
-                int fim = ini + random.nextInt(15) + ini;
-                for (int i = ini; i < fim; i++) {
-                    resultadoBusca.add(String.format("Exemplo %d %s", i, o.getTermo()));
-                }
-                new ObjectOutputStream(socket.getOutputStream()).writeObject(resultadoBusca);
+                Thread.sleep(Servidor.TMAX);
+
+                new ObjectOutputStream(socket.getOutputStream()).writeObject(Servidor.pollResultados.get(consumidorRequest.getUser()));
 
             }
         } catch (IOException e) {
             // faz nada
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | InterruptedException e) {
             e.printStackTrace();
         }
         System.out.println("Conexão fechada com o consumidor");
