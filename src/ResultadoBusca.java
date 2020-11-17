@@ -1,14 +1,12 @@
-package pucpr.servidor;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ResultadoBusca implements Serializable {
     private String identificacao;
-    private List<String> resultado;
+    private List<Produto> resultado;
 
-    public ResultadoBusca(String identificacao) {
+    public ResultadoBusca(String nomeLoja, String identificacao) {
         this.identificacao = identificacao;
         this.resultado = new ArrayList<>();
     }
@@ -21,11 +19,12 @@ public class ResultadoBusca implements Serializable {
         this.identificacao = identificacao;
     }
 
-    public List<String> getResultado() {
+    public List<Produto> getResultado() {
         return resultado;
     }
 
-    public void addResultado(String s) {
-        this.resultado.add(s);
+    public void addResultado(Produto p) {
+        this.resultado.add(p);
     }
+
 }

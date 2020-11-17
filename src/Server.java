@@ -1,5 +1,3 @@
-package pucpr.servidor;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
-public class Servidor {
+public class Server {
     public static long TMAX = 1000;
     public static List<Busca> historico;
     public static Semaphore mutexHist = new Semaphore(1);
@@ -17,8 +15,8 @@ public class Servidor {
 
     public static void main(String[] args) throws InterruptedException {
         historico = new ArrayList<>();
-        final ServerAdmin serverAdmin = new ServerAdmin();
-        final ServerConsumidor serverConsumidor = new ServerConsumidor();
+        final AdminServer serverAdmin = new AdminServer();
+        final ConsumidorServer serverConsumidor = new ConsumidorServer();
         final UPDServer updServer = new UPDServer();
         serverAdmin.start();
         serverConsumidor.start();

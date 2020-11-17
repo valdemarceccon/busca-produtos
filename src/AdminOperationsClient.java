@@ -1,5 +1,3 @@
-package pucpr.client;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,13 +5,11 @@ import java.net.Socket;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-import pucpr.servidor.*;
-
-public class AdminOperations {
+public class AdminOperationsClient {
     private final Socket socket;
     private final Scanner scanner;
 
-    public AdminOperations(Socket socket, Scanner scanner) {
+    public AdminOperationsClient(Socket socket, Scanner scanner) {
         this.socket = socket;
         this.scanner = scanner;
     }

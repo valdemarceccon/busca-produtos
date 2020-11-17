@@ -1,6 +1,5 @@
-package pucpr.servidor;
-
 import java.io.Serializable;
+
 
 public class AtualizarTMaxRequest extends AdminRequest implements Serializable {
     private final long novoValor;

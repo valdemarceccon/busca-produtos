@@ -1,14 +1,9 @@
-package pucpr.servidor;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
-public class AdminOperations extends Thread {
+public class AdminOperationsServer extends Thread {
 
     private final Socket socket;
 
@@ -40,27 +35,27 @@ public class AdminOperations extends Thread {
 
     private void responderHistorico() {
         HistoricoBuscasResponse histresp = new HistoricoBuscasResponse();
-        histresp.historico = Servidor.historico;
+        histresp.historico = Server.historico;
         writeOutputStream(histresp);
     }
 
     private void responderVerTMax() {
         TMaxResponse tMaxResponse = new TMaxResponse();
-        tMaxResponse.valorAtual = Servidor.TMAX;
+        tMaxResponse.valorAtual = Server.TMAX;
         writeOutputStream(tMaxResponse);
     }
 
     private void atualizarTMax(AtualizarTMaxRequest request) {
         try {
-            Servidor.TMAX = request.getNovoValor();
+            Server.TMAX = request.getNovoValor();
             TMaxResponse tMaxResponseUpdate = new TMaxResponse();
-            tMaxResponseUpdate.valorAtual = Servidor.TMAX;
+            tMaxResponseUpdate.valorAtual = Server.TMAX;
             writeOutputStream(tMaxResponseUpdate);
         } catch (Exception e) {
             TMaxResponse tMaxResponseUpdate = new TMaxResponse();
             tMaxResponseUpdate.status = RequestStatus.ERRO;
             tMaxResponseUpdate.mensagem = String.format("Valor para Tmax invalido: %s", e.getMessage());
-            tMaxResponseUpdate.valorAtual = Servidor.TMAX;
+            tMaxResponseUpdate.valorAtual = Server.TMAX;
             writeOutputStream(tMaxResponseUpdate);
         }
     }
@@ -75,7 +70,7 @@ public class AdminOperations extends Thread {
         }
     }
 
-    public AdminOperations(Socket socket) {
+    public AdminOperationsServer(Socket socket) {
         this.socket = socket;
     }
 

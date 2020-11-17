@@ -1,5 +1,3 @@
-package pucpr.servidor;
-
 import java.io.Serializable;
 
 public abstract class Response implements Serializable {

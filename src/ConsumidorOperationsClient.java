@@ -1,19 +1,14 @@
-package pucpr.client;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import pucpr.servidor.ConsumidorRequest;
-import pucpr.servidor.ResultadoBusca;
-
-public class ConsumidorOperations {
+public class ConsumidorOperationsClient {
 
     private final Socket socket;
     private final String nome;
 
-    public ConsumidorOperations(Socket socket, String nome) {
+    public ConsumidorOperationsClient(Socket socket, String nome) {
         this.socket = socket;
         this.nome = nome;
     }

@@ -1,14 +1,8 @@
-package pucpr.client;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
-
-import pucpr.Constantes;
-import pucpr.servidor.ResultadoBusca;
 
 public class Consumidor {
     public static void main(String[] args) {
@@ -19,11 +13,11 @@ public class Consumidor {
             final String identificacao = UUID.randomUUID().toString();
             while (socket.isConnected()) {
                 String termo = readTermo(scanner);
-                final ConsumidorOperations consumidorOperations = new ConsumidorOperations(socket, identificacao);
+                final ConsumidorOperationsClient consumidorOperations = new ConsumidorOperationsClient(socket, identificacao);
                 final ResultadoBusca resultado = consumidorOperations.buscar(termo);
                 System.out.println("Resultados da busca: ");
-                for (String s : resultado.getResultado()) {
-                    System.out.println("  - " + s);
+                for (Produto s : resultado.getResultado()) {
+                    System.out.printf("%s - %s%n", s.getNomeLoja(), s.getNomeProduto());
                 }
                 System.out.println();
             }

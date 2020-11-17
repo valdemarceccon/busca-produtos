@@ -1,11 +1,7 @@
-package pucpr.client;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
-
-import pucpr.Constantes;
 
 public class Admin {
     public static void main(String[] args) {
@@ -14,7 +10,7 @@ public class Admin {
             System.out.println("Bem vindo ao terminal de admin");
             while (socket.isConnected()) {
                 String opts = menu(scanner);
-                AdminOperations operations = new AdminOperations(socket, scanner);
+                AdminOperationsClient operations = new AdminOperationsClient(socket, scanner);
                 boolean opaoValida = execOpcao(opts, operations);
 
                 while (!opaoValida) {
@@ -42,7 +38,7 @@ public class Admin {
         return scanner.nextLine();
     }
 
-    private static boolean execOpcao(String opts, AdminOperations admOp) {
+    private static boolean execOpcao(String opts, AdminOperationsClient admOp) {
         if (opts == null || opts.trim().isEmpty()) {
             return false;
         }

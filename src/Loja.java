@@ -1,15 +1,8 @@
-package pucpr.lojas;
-
-import static pucpr.Constantes.PORTA_GRUPO;
 
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import pucpr.Constantes;
-import pucpr.servidor.Busca;
-import pucpr.servidor.ResultadoBusca;
 
 public class Loja extends Thread {
 
@@ -29,7 +22,7 @@ public class Loja extends Thread {
     public void run() {
         try {
             final InetAddress byName = InetAddress.getByName("224.0.0.1");
-            MulticastSocket socket = new MulticastSocket(PORTA_GRUPO);
+            MulticastSocket socket = new MulticastSocket(Constantes.PORTA_GRUPO);
             socket.joinGroup(byName);
 
             DatagramPacket datagramPacket = new DatagramPacket(new byte[4096], 4096);
@@ -49,10 +42,10 @@ public class Loja extends Thread {
 
     private void enviarParaServer(Busca busca) {
         StringBuilder r = new StringBuilder();
-        final ResultadoBusca resultadoBusca = new ResultadoBusca(busca.getUsuario());
+        final ResultadoBusca resultadoBusca = new ResultadoBusca(this.nome, busca.getUsuario());
         for (String s : estoque) {
             if (s.toUpperCase().contains(busca.getTermo().toUpperCase()))
-            resultadoBusca.addResultado(s);
+                resultadoBusca.addResultado(new Produto(this.nome, s));
         }
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -60,7 +53,6 @@ public class Loja extends Thread {
             outputStream.writeObject(resultadoBusca);
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(out.toByteArray(), out.size(), new InetSocketAddress(Constantes.PORTA_UPD));
-//            packet.setData(r.toString().getBytes(), 0, r.length());
             socket.send(packet);
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,18 +64,26 @@ public class Loja extends Thread {
         l1.adicionarProduto("Picole");
         l1.adicionarProduto("Bolo");
         l1.adicionarProduto("Vassoura");
-        l1.adicionarProduto("Teste");
 
         Loja l2 = new Loja("Loja 2");
-        l2.adicionarProduto("Picole 2");
-        l2.adicionarProduto("Bolo 2");
-        l2.adicionarProduto("Vassoura 2");
-        l2.adicionarProduto("Teste 2");
+        l2.adicionarProduto("Picole");
+        l2.adicionarProduto("Bolo");
+        l2.adicionarProduto("Pão de batata");
+        l2.adicionarProduto("Torresmo");
 
-        l2.start();
+        Loja l3 = new Loja("Loja 3");
+        l3.adicionarProduto("Picole");
+        l3.adicionarProduto("Sabonete");
+        l3.adicionarProduto("Leite condensado");
+        l3.adicionarProduto("Esfregao");
+        l3.adicionarProduto("Bombril");
+
         l1.start();
-        l2.join();
+        l2.start();
+        l3.start();
         l1.join();
+        l2.join();
+        l3.join();
     }
 }
 

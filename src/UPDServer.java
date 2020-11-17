@@ -1,5 +1,3 @@
-package pucpr.servidor;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -7,8 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
-
-import pucpr.Constantes;
 
 public class UPDServer extends Thread {
 
@@ -25,9 +21,9 @@ public class UPDServer extends Thread {
                 final ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(packet.getData()));
                 ResultadoBusca resp = (ResultadoBusca) inputStream.readObject();
 
-                Servidor.adicionar(resp);
-                for (String s : resp.getResultado()) {
-                    System.out.println("Recebeu da loja: " + s);
+                Server.adicionar(resp);
+                for (Produto p: resp.getResultado()) {
+                    System.out.printf("Recebeu %s da %s: %n", p.getNomeProduto(), p.getNomeLoja());
                 }
             }
 
