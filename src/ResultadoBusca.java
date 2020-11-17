@@ -4,11 +4,20 @@ import java.util.List;
 
 public class ResultadoBusca implements Serializable {
     private String identificacao;
+    private RequestStatus requestStatus;
+    private String msg;
     private List<Produto> resultado;
 
     public ResultadoBusca(String nomeLoja, String identificacao) {
         this.identificacao = identificacao;
         this.resultado = new ArrayList<>();
+        this.requestStatus = RequestStatus.SUCESSO;
+    }
+
+    public ResultadoBusca(String mensagem, RequestStatus status) {
+        this.resultado = new ArrayList<>();
+        this.requestStatus = status;
+        this.msg = mensagem;
     }
 
     public String getIdentificacao() {
@@ -27,4 +36,11 @@ public class ResultadoBusca implements Serializable {
         this.resultado.add(p);
     }
 
+    public RequestStatus getRequestStatus() {
+        return requestStatus;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
 }

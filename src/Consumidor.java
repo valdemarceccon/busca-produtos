@@ -16,8 +16,12 @@ public class Consumidor {
                 final ConsumidorOperationsClient consumidorOperations = new ConsumidorOperationsClient(socket, identificacao);
                 final ResultadoBusca resultado = consumidorOperations.buscar(termo);
                 System.out.println("Resultados da busca: ");
-                for (Produto s : resultado.getResultado()) {
-                    System.out.printf("%s - %s%n", s.getNomeLoja(), s.getNomeProduto());
+                if (resultado.getRequestStatus() == RequestStatus.ERRO) {
+                    System.out.println(resultado.getMsg());
+                } else {
+                    for (Produto s : resultado.getResultado()) {
+                        System.out.printf("%s - %s $%.2f%n", s.getNomeLoja(), s.getNomeProduto(), s.getPreco());
+                    }
                 }
                 System.out.println();
             }

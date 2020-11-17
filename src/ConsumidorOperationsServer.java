@@ -33,7 +33,12 @@ public class ConsumidorOperationsServer extends Thread {
 
                 Thread.sleep(Server.TMAX);
 
-                new ObjectOutputStream(socket.getOutputStream()).writeObject(Server.pollResultados.get(consumidorRequest.getUser()));
+                final ResultadoBusca obj = Server.pollResultados.get(consumidorRequest.getUser());
+                final ObjectOutputStream respOut = new ObjectOutputStream(socket.getOutputStream());
+                if (obj != null && !obj.getResultado().isEmpty())
+                    respOut.writeObject(obj);
+                else
+                    respOut.writeObject(new ResultadoBusca("Produto não encontrado", RequestStatus.ERRO));
 
             }
         } catch (IOException e) {

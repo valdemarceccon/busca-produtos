@@ -7,15 +7,15 @@ import java.util.List;
 public class Loja extends Thread {
 
     private final String nome;
-    private List<String> estoque;
+    private List<Produto> estoque;
 
     public Loja(String nome) {
         this.nome = nome;
         this.estoque = new ArrayList<>();
     }
 
-    public void adicionarProduto(String produto) {
-        this.estoque.add(produto);
+    public void adicionarProduto(String produto, double preco) {
+        this.estoque.add(new Produto(nome, produto, preco));
     }
 
     @Override
@@ -43,9 +43,9 @@ public class Loja extends Thread {
     private void enviarParaServer(Busca busca) {
         StringBuilder r = new StringBuilder();
         final ResultadoBusca resultadoBusca = new ResultadoBusca(this.nome, busca.getUsuario());
-        for (String s : estoque) {
-            if (s.toUpperCase().contains(busca.getTermo().toUpperCase()))
-                resultadoBusca.addResultado(new Produto(this.nome, s));
+        for (Produto produto : estoque) {
+            if (produto.getNomeProduto().toUpperCase().contains(busca.getTermo().toUpperCase()))
+                resultadoBusca.addResultado(produto);
         }
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -53,30 +53,35 @@ public class Loja extends Thread {
             outputStream.writeObject(resultadoBusca);
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(out.toByteArray(), out.size(), new InetSocketAddress(Constantes.PORTA_UPD));
+            if (nome.equals("Loja 2")) {
+                sleep(10000);
+            }
             socket.send(packet);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
         Loja l1 = new Loja("Loja 1");
-        l1.adicionarProduto("Picole");
-        l1.adicionarProduto("Bolo");
-        l1.adicionarProduto("Vassoura");
+        l1.adicionarProduto("Picole", 1.50);
+        l1.adicionarProduto("Bolo", 50.00);
+        l1.adicionarProduto("Vassoura", 10.99);
 
         Loja l2 = new Loja("Loja 2");
-        l2.adicionarProduto("Picole");
-        l2.adicionarProduto("Bolo");
-        l2.adicionarProduto("Pão de batata");
-        l2.adicionarProduto("Torresmo");
+        l2.adicionarProduto("Picole", 2.00);
+        l2.adicionarProduto("Bolo", 3.00);
+        l2.adicionarProduto("Pão de batata", 5.00);
+        l2.adicionarProduto("Torresmo", 3.00);
 
         Loja l3 = new Loja("Loja 3");
-        l3.adicionarProduto("Picole");
-        l3.adicionarProduto("Sabonete");
-        l3.adicionarProduto("Leite condensado");
-        l3.adicionarProduto("Esfregao");
-        l3.adicionarProduto("Bombril");
+        l3.adicionarProduto("Picole", 10.00);
+        l3.adicionarProduto("Sabonete", 3.99);
+        l3.adicionarProduto("Leite condensado", 5.00);
+        l3.adicionarProduto("Esfregao", 10.00);
+        l3.adicionarProduto("Bombril", 0.50);
 
         l1.start();
         l2.start();
