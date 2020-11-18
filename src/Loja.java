@@ -1,10 +1,13 @@
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Loja extends Thread {
+public class Loja {
 
     private final String nome;
     private List<Produto> estoque;
@@ -18,8 +21,7 @@ public class Loja extends Thread {
         this.estoque.add(new Produto(nome, produto, preco));
     }
 
-    @Override
-    public void run() {
+    public void iniciarServer() {
         try {
             final InetAddress byName = InetAddress.getByName("224.0.0.1");
             MulticastSocket socket = new MulticastSocket(Constantes.PORTA_GRUPO);
@@ -54,7 +56,7 @@ public class Loja extends Thread {
             DatagramSocket socket = new DatagramSocket();
             DatagramPacket packet = new DatagramPacket(out.toByteArray(), out.size(), new InetSocketAddress(Constantes.PORTA_UPD));
             if (nome.equals("Loja 2")) {
-                sleep(10000);
+                Thread.sleep(10000);
             }
             socket.send(packet);
         } catch (IOException e) {
@@ -64,31 +66,37 @@ public class Loja extends Thread {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Loja l1 = new Loja("Loja 1");
-        l1.adicionarProduto("Picole", 1.50);
-        l1.adicionarProduto("Bolo", 50.00);
-        l1.adicionarProduto("Vassoura", 10.99);
+    public static void main(String[] args) throws InterruptedException, IOException {
 
-        Loja l2 = new Loja("Loja 2");
-        l2.adicionarProduto("Picole", 2.00);
-        l2.adicionarProduto("Bolo", 3.00);
-        l2.adicionarProduto("Pão de batata", 5.00);
-        l2.adicionarProduto("Torresmo", 3.00);
+        if(args.length == 0) {
+            System.out.println("Nome da loja obrigatório");
+            System.exit(1);
+        }
 
-        Loja l3 = new Loja("Loja 3");
-        l3.adicionarProduto("Picole", 10.00);
-        l3.adicionarProduto("Sabonete", 3.99);
-        l3.adicionarProduto("Leite condensado", 5.00);
-        l3.adicionarProduto("Esfregao", 10.00);
-        l3.adicionarProduto("Bombril", 0.50);
+        final String arg = args[0];
 
-        l1.start();
-        l2.start();
-        l3.start();
-        l1.join();
-        l2.join();
-        l3.join();
+        Loja loja = new Loja(arg);
+
+        final Path produtos = Paths.get(String.format("%s.csv", loja.nome));
+        if (!Files.exists(produtos)) {
+            System.out.printf("Não existem produtos cadastrados para a loja %s%n", loja.nome);
+        }
+
+        loja.loadProdutos();
+
+        loja.iniciarServer();
+    }
+
+    private void loadProdutos() throws IOException {
+        final Path produtos = Paths.get(String.format("%s.csv", nome));
+        for (String p : Files.readAllLines(produtos)) {
+            if (p != null && !p.trim().isEmpty()) {
+                final String[] split = p.split(",");
+                String nome = split[0].trim();
+                String valor = split[1].trim();
+                adicionarProduto(nome, Double.parseDouble(valor));
+            }
+        }
     }
 }
 
